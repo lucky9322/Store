@@ -1,5 +1,8 @@
 package com.zdd.util;
 
+import com.sun.mail.util.MailSSLSocketFactory;
+
+import java.security.GeneralSecurityException;
 import java.util.Properties;
 
 import javax.mail.Authenticator;
@@ -14,45 +17,60 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMessage.RecipientType;
 
 public class MailUtils {
+    /**
+     * @param to       收件人地址
+     * @param emailMsg 消息内容
+     * @throws MessagingException
+     * @throws GeneralSecurityException
+     */
+    public static void sendMail(String to, String emailMsg)
+            throws MessagingException, GeneralSecurityException {
 
-	public static void sendMail(String email, String emailMsg)
-			throws AddressException, MessagingException {
-		// 1.创建一个程序与邮件服务器会话对象 Session
+//        // 收件人电子邮箱
+//        String to = "86431843@qq.com";
 
-		Properties props = new Properties();
-		//设置发送的协议
-		props.setProperty("mail.transport.protocol", "SMTP");
-		
-		//设置发送邮件的服务器
-		props.setProperty("mail.host", "localhost");
-		props.setProperty("mail.smtp.auth", "true");// 指定验证为true
+        // 发件人电子邮箱
+        String from = "1075987401@qq.com";
 
-		// 创建验证器
-		Authenticator auth = new Authenticator() {
-			public PasswordAuthentication getPasswordAuthentication() {
-				//设置发送人的帐号和密码
-				return new PasswordAuthentication("service", "123");
-			}
-		};
+        // 指定发送邮件的主机为 smtp.qq.com
+        String host = "smtp.qq.com";  //QQ 邮件服务器
 
-		Session session = Session.getInstance(props, auth);
+        // 获取系统属性
+        Properties properties = System.getProperties();
 
-		// 2.创建一个Message，它相当于是邮件内容
-		Message message = new MimeMessage(session);
+        // 设置邮件服务器
+        properties.setProperty("mail.smtp.host", host);
+        // 指定验证为true
+        properties.put("mail.smtp.auth", "true");
 
-		//设置发送者
-		message.setFrom(new InternetAddress("service@store.com"));
 
-		//设置发送方式与接收者
-		message.setRecipient(RecipientType.TO, new InternetAddress(email)); 
+        MailSSLSocketFactory sf = new MailSSLSocketFactory();
+        sf.setTrustAllHosts(true);
+        properties.put("mail.smtp.ssl.enable", "true");
+        properties.put("mail.smtp.ssl.socketFactory", sf);
+        // 获取默认session对象
+        Session session = Session.getDefaultInstance(properties, new Authenticator() {
+            public PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication("1075987401@qq.com", "cuebijjxuoukichi"); //发件人邮件用户名、密码
+            }
+        });
 
-		//设置邮件主题
-		message.setSubject("用户激活");
-		 
-		//设置邮件内容
-		message.setContent(emailMsg, "text/html;charset=utf-8");
+        // 2.创建一个Message，它相当于是邮件内容
+        Message message = new MimeMessage(session);
 
-		// 3.创建 Transport用于将邮件发送
-		Transport.send(message);
-	}
+        //设置发送者
+        message.setFrom(new InternetAddress(from));
+
+        //设置发送方式与接收者
+        message.setRecipient(RecipientType.TO, new InternetAddress(to));
+
+        //设置邮件主题
+        message.setSubject("用户激活");
+
+        //设置邮件内容
+        message.setContent(emailMsg, "text/html;charset=utf-8");
+
+        // 3.创建 Transport用于将邮件发送
+        Transport.send(message);
+    }
 }

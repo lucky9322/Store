@@ -11,6 +11,8 @@
     <title>my store</title>
   </head>
   <body>
-  welcome to store
+  <%
+    response.sendRedirect(request.getContextPath()+"/jsp/index.jsp");
+  %>
   </body>
 </html>
