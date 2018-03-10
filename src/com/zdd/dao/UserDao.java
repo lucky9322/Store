@@ -10,4 +10,8 @@ import java.sql.SQLException;
  */
 public interface UserDao {
     void save(User user) throws SQLException;
+
+    User getByCode(String code)throws Exception;
+
+    void update(User user)throws Exception;
 }

@@ -4,6 +4,7 @@ import com.zdd.dao.UserDao;
 import com.zdd.domain.User;
 import com.zdd.util.DataSourceUtils;
 import org.apache.commons.dbutils.QueryRunner;
+import org.apache.commons.dbutils.handlers.BeanHandler;
 
 import java.sql.SQLException;
 
@@ -35,5 +36,32 @@ public class UserDaoImpl implements UserDao {
                 user.getName(), user.getEmail(),
                 user.getBirthday(), user.getBirthday(), user.getSex(), user.getState(),
                 user.getCode());
+    }
+
+    /**
+     * 通过激活码获取用户
+     *
+     * @param code
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public User getByCode(String code) throws Exception {
+        QueryRunner qr = new QueryRunner(DataSourceUtils.getDataSource());
+        String sql = "select * from user where code = ? limit 1";
+        return qr.query(sql, new BeanHandler<User>(User.class), code);
+    }
+
+    /**
+     * 更新用户
+     *
+     * @param user
+     * @throws Exception
+     */
+    @Override
+    public void update(User user) throws Exception {
+        QueryRunner qr = new QueryRunner(DataSourceUtils.getDataSource());
+        String sql = "update user set password = ? , sex = ? , state = ? where uid = ? ";
+        qr.update(sql, user.getPassword(), user.getSex(), user.getState(), user.getUid());
     }
 }

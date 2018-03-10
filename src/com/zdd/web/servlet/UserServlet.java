@@ -24,6 +24,40 @@ import java.lang.reflect.InvocationTargetException;
  */
 public class UserServlet extends BaseServlet {
 
+
+    /**
+     * 用户激活
+     *
+     * @param req
+     * @param resp
+     * @return
+     * @throws ServletException
+     * @throws IOException
+     */
+    public String active(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        try {
+            //1. 接收code
+            String code = req.getParameter("code");
+
+            //2. 调用service完成激活
+            UserService us = new UserServiceImpl();
+            User user = us.active(code);
+
+            //3. 判断user 生成不同的提示信息
+            if (null == user) {
+//            没有找到这个用户 激活失败
+                req.setAttribute("msg", "激活失败，请重新激活或者重新注册");
+                return "/jsp/msg.jsp";
+            }
+//        激活成功
+            req.setAttribute("msg", "恭喜您激活成功,可以登录了");
+        } catch (Exception e) {
+            e.printStackTrace();
+            req.setAttribute("msg", "激活失败，请重新激活或者重新注册");
+        }
+        return "/jsp/msg.jsp";
+    }
+
     /**
      * 跳转到注册页面
      *
